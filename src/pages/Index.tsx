@@ -1,14 +1,23 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useGame } from '@/contexts/GameContext';
+import Landing from '@/components/game/Landing';
+import Onboarding from '@/components/game/Onboarding';
+import Dashboard from '@/components/game/Dashboard';
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const { state } = useGame();
+
+  // Show landing for new users
+  if (!state.user && !state.isOnboarding) {
+    return <Landing />;
+  }
+
+  // Show onboarding for users creating account
+  if (state.isOnboarding && !state.user) {
+    return <Onboarding />;
+  }
+
+  // Show dashboard for logged in users
+  return <Dashboard />;
 };
 
 export default Index;
