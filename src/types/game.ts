@@ -2,7 +2,7 @@
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'evil';
 
-export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'devops';
+export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'ansible' | 'devops';
 
 export interface Level {
   id: LevelId;
@@ -160,7 +160,16 @@ export const LEVELS: Level[] = [
     description: 'Build with images, containers, Dockerfiles, and volumes',
     color: 'level-docker',
     unlockRequirement: 2000,
-    totalQuestions: 20,
+    totalQuestions: 25,
+  },
+  {
+    id: 'ansible',
+    name: 'Ansible Automator',
+    emoji: '🤖',
+    description: 'Master playbooks, roles, inventories, and automation',
+    color: 'level-ansible',
+    unlockRequirement: 2800,
+    totalQuestions: 25,
   },
   {
     id: 'devops',
@@ -168,8 +177,8 @@ export const LEVELS: Level[] = [
     emoji: '⚔️',
     description: 'Face mixed advanced scenarios and interview challenges',
     color: 'level-devops',
-    unlockRequirement: 3000,
-    totalQuestions: 20,
+    unlockRequirement: 3600,
+    totalQuestions: 25,
   },
 ];
 

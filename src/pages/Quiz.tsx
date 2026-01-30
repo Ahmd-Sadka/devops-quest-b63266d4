@@ -7,14 +7,23 @@ import { Progress } from '@/components/ui/progress';
 import { getQuizQuestions } from '@/data/questions';
 import { LEVELS, LevelId } from '@/types/game';
 import { ArrowLeft, Check, X } from 'lucide-react';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useConfetti } from '@/hooks/useConfetti';
+import { useBadges } from '@/hooks/useBadges';
+import { BadgeQueue } from '@/components/game/BadgeNotification';
 
 const Quiz = () => {
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
-  const { state, startQuiz, submitAnswer, completeQuiz } = useGame();
+  const { state, startQuiz, submitAnswer, completeQuiz, dispatch } = useGame();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [pendingBadges, setPendingBadges] = useState<string[]>([]);
+  
+  const { playSound } = useSoundEffects();
+  const { burstConfetti, sidesConfetti } = useConfetti();
+  const { checkAndAwardBadges } = useBadges();
 
   const level = LEVELS.find(l => l.id === levelId);
   const quiz = state.currentQuiz;
@@ -45,9 +54,37 @@ const Quiz = () => {
     const total = quiz.answers.length;
     const accuracy = Math.round((correct / total) * 100);
     const totalXP = quiz.answers.reduce((sum, a) => sum + a.xpEarned, 0);
+    
+    // Check for new badges when quiz completes
+    useEffect(() => {
+      if (state.user && quiz.isComplete) {
+        const newBadges = checkAndAwardBadges(state.user);
+        if (newBadges.length > 0) {
+          setPendingBadges(newBadges);
+          newBadges.forEach(badgeId => {
+            dispatch({ type: 'UNLOCK_BADGE', payload: badgeId });
+          });
+          playSound('badge');
+          sidesConfetti();
+        }
+        
+        if (accuracy >= 70) {
+          playSound('levelUp');
+          burstConfetti();
+        }
+      }
+    }, [quiz.isComplete]);
 
     return (
       <div className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center">
+        {/* Badge notifications */}
+        {pendingBadges.length > 0 && (
+          <BadgeQueue 
+            badgeIds={pendingBadges} 
+            onComplete={() => setPendingBadges([])} 
+          />
+        )}
+        
         <Card className="max-w-md w-full p-8 text-center bg-card border-border">
           <div className="text-6xl mb-4">{accuracy >= 70 ? '🎉' : '💪'}</div>
           <h1 className="text-2xl font-bold mb-2">
@@ -106,6 +143,9 @@ const Quiz = () => {
     const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     const xpEarned = isCorrect ? currentQuestion.xpReward : 0;
+    
+    // Play sound effect
+    playSound(isCorrect ? 'correct' : 'wrong');
     
     setShowResult(true);
     
