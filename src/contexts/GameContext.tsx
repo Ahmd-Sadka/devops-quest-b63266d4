@@ -24,6 +24,7 @@ const initialLevelProgress: Record<LevelId, LevelProgress> = {
   bash: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
   git: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
   docker: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
+  ansible: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
   devops: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
 };
 

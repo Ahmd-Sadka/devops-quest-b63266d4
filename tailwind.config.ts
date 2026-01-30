@@ -65,6 +65,7 @@ export default {
           bash: "hsl(var(--level-bash))",
           git: "hsl(var(--level-git))",
           docker: "hsl(var(--level-docker))",
+          ansible: "hsl(var(--level-ansible))",
           devops: "hsl(var(--level-devops))",
         },
         sidebar: {

@@ -1,6 +1,8 @@
 import { Question } from '@/types/game';
+import { ansibleQuestions } from './ansible-questions';
+import { additionalLinuxQuestions, additionalBashQuestions, additionalGitQuestions, additionalDockerQuestions, additionalDevOpsQuestions } from './additional-questions';
 
-// Pre-generated AI Question Bank - 100+ DevOps Questions
+// Pre-generated AI Question Bank - 150+ DevOps Questions
 
 const wrongFeedbackPool = [
   "Oops! That would definitely page the on-call team at 3 AM 😅",
@@ -1665,14 +1667,25 @@ export const questions: Question[] = [
   },
 ];
 
+// Combine all questions
+export const allQuestions: Question[] = [
+  ...questions,
+  ...ansibleQuestions,
+  ...additionalLinuxQuestions,
+  ...additionalBashQuestions,
+  ...additionalGitQuestions,
+  ...additionalDockerQuestions,
+  ...additionalDevOpsQuestions,
+];
+
 // Helper function to get questions by level
 export const getQuestionsByLevel = (levelId: string): Question[] => {
-  return questions.filter(q => q.levelId === levelId);
+  return allQuestions.filter(q => q.levelId === levelId);
 };
 
 // Helper function to get questions by difficulty
 export const getQuestionsByDifficulty = (difficulty: string): Question[] => {
-  return questions.filter(q => q.difficulty === difficulty);
+  return allQuestions.filter(q => q.difficulty === difficulty);
 };
 
 // Helper function to shuffle array
