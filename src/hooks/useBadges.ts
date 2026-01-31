@@ -12,22 +12,22 @@ export function useBadges() {
     }
 
     // Linux Survivor - Complete Linux level
-    if (user.levelProgress.linux.completed && !user.earnedBadges.includes('linux-survivor')) {
+    if (user.levelProgress.linux?.completed && !user.earnedBadges.includes('linux-survivor')) {
       newBadges.push('linux-survivor');
     }
 
     // Script Breaker - Complete Bash level
-    if (user.levelProgress.bash.completed && !user.earnedBadges.includes('script-breaker')) {
+    if (user.levelProgress.bash?.completed && !user.earnedBadges.includes('script-breaker')) {
       newBadges.push('script-breaker');
     }
 
     // Git Conflict Slayer - Complete Git level
-    if (user.levelProgress.git.completed && !user.earnedBadges.includes('conflict-slayer')) {
+    if (user.levelProgress.git?.completed && !user.earnedBadges.includes('conflict-slayer')) {
       newBadges.push('conflict-slayer');
     }
 
     // Docker Whisperer - Complete Docker level
-    if (user.levelProgress.docker.completed && !user.earnedBadges.includes('docker-whisperer')) {
+    if (user.levelProgress.docker?.completed && !user.earnedBadges.includes('docker-whisperer')) {
       newBadges.push('docker-whisperer');
     }
 
@@ -36,10 +36,44 @@ export function useBadges() {
       newBadges.push('ansible-automator');
     }
 
+    // K8s Captain - Complete Kubernetes level
+    if (user.levelProgress.kubernetes?.completed && !user.earnedBadges.includes('k8s-captain')) {
+      newBadges.push('k8s-captain');
+    }
+
+    // Terraform Titan - Complete Terraform level
+    if (user.levelProgress.terraform?.completed && !user.earnedBadges.includes('terraform-titan')) {
+      newBadges.push('terraform-titan');
+    }
+
+    // AWS Warrior - Complete AWS level
+    if (user.levelProgress.aws?.completed && !user.earnedBadges.includes('aws-warrior')) {
+      newBadges.push('aws-warrior');
+    }
+
+    // CI/CD Commander - Complete CI/CD level
+    if (user.levelProgress.cicd?.completed && !user.earnedBadges.includes('cicd-commander')) {
+      newBadges.push('cicd-commander');
+    }
+
+    // OpenShift Operator - Complete OpenShift level
+    if (user.levelProgress.openshift?.completed && !user.earnedBadges.includes('openshift-operator')) {
+      newBadges.push('openshift-operator');
+    }
+
     // DevOps Legend - Complete all levels
     const allCompleted = LEVELS.every(level => user.levelProgress[level.id]?.completed);
     if (allCompleted && !user.earnedBadges.includes('devops-legend')) {
       newBadges.push('devops-legend');
+    }
+
+    // Cloud Master - Complete AWS, K8s, and OpenShift
+    const cloudLevelsCompleted = 
+      user.levelProgress.aws?.completed && 
+      user.levelProgress.kubernetes?.completed && 
+      user.levelProgress.openshift?.completed;
+    if (cloudLevelsCompleted && !user.earnedBadges.includes('cloud-master')) {
+      newBadges.push('cloud-master');
     }
 
     // Perfectionist - 100% accuracy on any level
@@ -78,6 +112,16 @@ export function useBadges() {
     );
     if (hasSpeedRun && !user.earnedBadges.includes('speed-demon')) {
       newBadges.push('speed-demon');
+    }
+
+    // Boss Slayer - Defeat 5 bosses
+    if (user.stats.bossesDefeated >= 5 && !user.earnedBadges.includes('boss-slayer')) {
+      newBadges.push('boss-slayer');
+    }
+
+    // Daily Warrior - Complete 10 daily challenges
+    if (user.stats.dailyChallengesCompleted >= 10 && !user.earnedBadges.includes('daily-warrior')) {
+      newBadges.push('daily-warrior');
     }
 
     return newBadges;

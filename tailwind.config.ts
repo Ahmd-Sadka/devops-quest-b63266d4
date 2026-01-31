@@ -66,6 +66,11 @@ export default {
           git: "hsl(var(--level-git))",
           docker: "hsl(var(--level-docker))",
           ansible: "hsl(var(--level-ansible))",
+          kubernetes: "hsl(var(--level-kubernetes))",
+          terraform: "hsl(var(--level-terraform))",
+          aws: "hsl(var(--level-aws))",
+          cicd: "hsl(var(--level-cicd))",
+          openshift: "hsl(var(--level-openshift))",
           devops: "hsl(var(--level-devops))",
         },
         sidebar: {

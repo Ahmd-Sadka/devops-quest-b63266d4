@@ -2,7 +2,7 @@
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'evil';
 
-export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'ansible' | 'devops';
+export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'ansible' | 'kubernetes' | 'terraform' | 'aws' | 'cicd' | 'openshift' | 'devops';
 
 export interface Level {
   id: LevelId;
@@ -10,7 +10,7 @@ export interface Level {
   emoji: string;
   description: string;
   color: string;
-  unlockRequirement: number; // XP required to unlock
+  unlockRequirement: number;
   totalQuestions: number;
 }
 
@@ -19,13 +19,14 @@ export interface Question {
   levelId: LevelId;
   difficulty: Difficulty;
   question: string;
-  code?: string; // Optional code snippet
+  code?: string;
   options: string[];
-  correctAnswer: number; // Index of correct answer
+  correctAnswer: number;
   explanation: string;
-  wrongFeedback: string[]; // Sarcastic messages for wrong answers
+  wrongFeedback: string[];
   xpReward: number;
   tags: string[];
+  isBoss?: boolean;
 }
 
 export interface Badge {
@@ -37,16 +38,27 @@ export interface Badge {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
+export interface PowerUp {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  cost: number;
+  effect: 'fifty_fifty' | 'skip' | 'time_freeze' | 'hint';
+}
+
 export interface UserProgress {
   username: string;
   avatarId: string;
   totalXP: number;
   currentLevel: number;
-  completedQuestions: string[]; // Question IDs
+  completedQuestions: string[];
   levelProgress: Record<LevelId, LevelProgress>;
-  earnedBadges: string[]; // Badge IDs
+  earnedBadges: string[];
   streak: StreakData;
   stats: UserStats;
+  powerUps: Record<string, number>;
+  dailyChallengeCompleted: string[];
   createdAt: string;
   lastActiveAt: string;
 }
@@ -56,14 +68,15 @@ export interface LevelProgress {
   completed: boolean;
   questionsAnswered: number;
   correctAnswers: number;
-  bestTime?: number; // Fastest completion time in seconds
+  bestTime?: number;
   attempts: number;
+  bossDefeated?: boolean;
 }
 
 export interface StreakData {
   currentStreak: number;
   longestStreak: number;
-  lastPracticeDate: string; // ISO date string
+  lastPracticeDate: string;
   streakShields: number;
   freezesUsed: number;
 }
@@ -71,10 +84,12 @@ export interface StreakData {
 export interface UserStats {
   totalQuestionsAnswered: number;
   correctAnswers: number;
-  totalTimeSpent: number; // In seconds
+  totalTimeSpent: number;
   averageAccuracy: number;
-  fastestAnswer: number; // Seconds
+  fastestAnswer: number;
   evilModeCompleted: number;
+  bossesDefeated: number;
+  dailyChallengesCompleted: number;
 }
 
 export interface QuizSession {
@@ -84,13 +99,16 @@ export interface QuizSession {
   answers: AnswerRecord[];
   startTime: number;
   isComplete: boolean;
+  isBossBattle?: boolean;
+  activePowerUp?: string;
+  timeFreezed?: boolean;
 }
 
 export interface AnswerRecord {
   questionId: string;
   selectedAnswer: number;
   isCorrect: boolean;
-  timeSpent: number; // Seconds
+  timeSpent: number;
   xpEarned: number;
 }
 
@@ -113,7 +131,7 @@ export interface DailyChallenge {
   levelId: LevelId;
   questionIds: string[];
   bonusXP: number;
-  timeLimit: number; // Seconds
+  timeLimit: number;
   isActive: boolean;
 }
 
@@ -172,13 +190,58 @@ export const LEVELS: Level[] = [
     totalQuestions: 25,
   },
   {
+    id: 'kubernetes',
+    name: 'K8s Captain',
+    emoji: '☸️',
+    description: 'Orchestrate pods, deployments, services, and clusters',
+    color: 'level-kubernetes',
+    unlockRequirement: 3600,
+    totalQuestions: 25,
+  },
+  {
+    id: 'terraform',
+    name: 'Terraform Titan',
+    emoji: '🏗️',
+    description: 'Infrastructure as Code with providers, modules, and state',
+    color: 'level-terraform',
+    unlockRequirement: 4500,
+    totalQuestions: 25,
+  },
+  {
+    id: 'aws',
+    name: 'AWS Warrior',
+    emoji: '☁️',
+    description: 'Conquer EC2, S3, IAM, Lambda, and cloud services',
+    color: 'level-aws',
+    unlockRequirement: 5500,
+    totalQuestions: 25,
+  },
+  {
+    id: 'cicd',
+    name: 'CI/CD Commander',
+    emoji: '🔄',
+    description: 'Master pipelines, GitHub Actions, Jenkins, and deployments',
+    color: 'level-cicd',
+    unlockRequirement: 6500,
+    totalQuestions: 25,
+  },
+  {
+    id: 'openshift',
+    name: 'OpenShift Operator',
+    emoji: '🎯',
+    description: 'Enterprise Kubernetes with Routes, BuildConfigs, and more',
+    color: 'level-openshift',
+    unlockRequirement: 7500,
+    totalQuestions: 25,
+  },
+  {
     id: 'devops',
-    name: 'DevOps Master',
+    name: 'DevOps Legend',
     emoji: '⚔️',
     description: 'Face mixed advanced scenarios and interview challenges',
     color: 'level-devops',
-    unlockRequirement: 3600,
-    totalQuestions: 25,
+    unlockRequirement: 8500,
+    totalQuestions: 30,
   },
 ];
 
@@ -193,6 +256,8 @@ export const AVATARS: Avatar[] = [
   { id: 'fire', name: 'Hotfix', emoji: '🔥', description: 'Production is fine' },
   { id: 'brain', name: 'Big Brain', emoji: '🧠', description: 'Galaxy brain solutions' },
   { id: 'skull', name: 'Destroyer', emoji: '💀', description: 'rm -rf survivor' },
+  { id: 'cloud', name: 'Cloud Native', emoji: '☁️', description: 'Born in the cloud' },
+  { id: 'helm', name: 'Helmsman', emoji: '⚓', description: 'Kubernetes navigator' },
 ];
 
 export const BADGES: Badge[] = [
@@ -202,7 +267,12 @@ export const BADGES: Badge[] = [
   { id: 'conflict-slayer', name: 'Git Conflict Slayer', emoji: '🥇', description: 'Complete Level 3', condition: 'Complete Git Survivor level', rarity: 'rare' },
   { id: 'docker-whisperer', name: 'Docker Whisperer', emoji: '🏆', description: 'Complete Level 4', condition: 'Complete Docker Architect level', rarity: 'epic' },
   { id: 'ansible-automator', name: 'Ansible Automator', emoji: '🤖', description: 'Complete Level 5', condition: 'Complete Ansible Automator level', rarity: 'epic' },
-  { id: 'devops-legend', name: 'DevOps Legend', emoji: '👑', description: 'Complete all levels', condition: 'Complete all 6 levels', rarity: 'legendary' },
+  { id: 'k8s-captain', name: 'K8s Captain', emoji: '☸️', description: 'Complete Level 6', condition: 'Complete Kubernetes level', rarity: 'epic' },
+  { id: 'terraform-titan', name: 'Terraform Titan', emoji: '🏗️', description: 'Complete Level 7', condition: 'Complete Terraform level', rarity: 'epic' },
+  { id: 'aws-warrior', name: 'AWS Warrior', emoji: '☁️', description: 'Complete Level 8', condition: 'Complete AWS level', rarity: 'legendary' },
+  { id: 'cicd-commander', name: 'CI/CD Commander', emoji: '🔄', description: 'Complete Level 9', condition: 'Complete CI/CD level', rarity: 'legendary' },
+  { id: 'openshift-operator', name: 'OpenShift Operator', emoji: '🎯', description: 'Complete Level 10', condition: 'Complete OpenShift level', rarity: 'legendary' },
+  { id: 'devops-legend', name: 'DevOps Legend', emoji: '👑', description: 'Complete all levels', condition: 'Complete all 11 levels', rarity: 'legendary' },
   
   // Special achievements
   { id: 'speed-demon', name: 'Speed Demon', emoji: '⚡', description: 'Complete any level in under 10 minutes', condition: 'Speed run a level', rarity: 'rare' },
@@ -213,6 +283,17 @@ export const BADGES: Badge[] = [
   { id: 'evil-conqueror', name: 'Evil Conqueror', emoji: '😈', description: 'Complete all Evil mode questions', condition: 'Master the hardest challenges', rarity: 'legendary' },
   { id: 'first-blood', name: 'First Blood', emoji: '🎯', description: 'Answer your first question correctly', condition: 'Get started', rarity: 'common' },
   { id: 'centurion', name: 'Centurion', emoji: '💪', description: 'Answer 100 questions', condition: 'Dedication', rarity: 'rare' },
+  { id: 'boss-slayer', name: 'Boss Slayer', emoji: '🗡️', description: 'Defeat 5 boss battles', condition: 'Conquer bosses', rarity: 'epic' },
+  { id: 'daily-warrior', name: 'Daily Warrior', emoji: '📅', description: 'Complete 10 daily challenges', condition: 'Daily dedication', rarity: 'rare' },
+  { id: 'power-user', name: 'Power User', emoji: '⚡', description: 'Use 20 power-ups', condition: 'Strategic player', rarity: 'common' },
+  { id: 'cloud-master', name: 'Cloud Master', emoji: '🌩️', description: 'Complete AWS, K8s, and OpenShift', condition: 'Cloud expertise', rarity: 'legendary' },
+];
+
+export const POWER_UPS: PowerUp[] = [
+  { id: 'fifty_fifty', name: '50/50', emoji: '✂️', description: 'Remove two wrong answers', cost: 50, effect: 'fifty_fifty' },
+  { id: 'skip', name: 'Skip Question', emoji: '⏭️', description: 'Skip without penalty', cost: 75, effect: 'skip' },
+  { id: 'time_freeze', name: 'Time Freeze', emoji: '❄️', description: 'Freeze timer for 30 seconds', cost: 100, effect: 'time_freeze' },
+  { id: 'hint', name: 'Hint Reveal', emoji: '💡', description: 'Get a helpful hint', cost: 60, effect: 'hint' },
 ];
 
 export const XP_REWARDS: Record<Difficulty, number> = {
@@ -222,7 +303,7 @@ export const XP_REWARDS: Record<Difficulty, number> = {
   evil: 50,
 };
 
-export const LEVEL_THRESHOLDS = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500];
+export const LEVEL_THRESHOLDS = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500, 6600, 7800, 9100, 10500];
 
 export function calculateLevel(xp: number): number {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
