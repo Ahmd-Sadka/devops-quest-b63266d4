@@ -41,6 +41,30 @@ const Quiz = () => {
     setShowResult(false);
   }, [quiz?.currentQuestionIndex]);
 
+  // Check for new badges when quiz completes - must be at top level
+  useEffect(() => {
+    if (state.user && quiz?.isComplete) {
+      const correct = quiz.answers.filter(a => a.isCorrect).length;
+      const total = quiz.answers.length;
+      const accuracy = Math.round((correct / total) * 100);
+      
+      const newBadges = checkAndAwardBadges(state.user);
+      if (newBadges.length > 0) {
+        setPendingBadges(newBadges);
+        newBadges.forEach(badgeId => {
+          dispatch({ type: 'UNLOCK_BADGE', payload: badgeId });
+        });
+        playSound('badge');
+        sidesConfetti();
+      }
+      
+      if (accuracy >= 70) {
+        playSound('levelUp');
+        burstConfetti();
+      }
+    }
+  }, [quiz?.isComplete, state.user, quiz?.answers, checkAndAwardBadges, dispatch, playSound, sidesConfetti, burstConfetti]);
+
   if (!level || !quiz || !state.user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -54,26 +78,6 @@ const Quiz = () => {
     const total = quiz.answers.length;
     const accuracy = Math.round((correct / total) * 100);
     const totalXP = quiz.answers.reduce((sum, a) => sum + a.xpEarned, 0);
-    
-    // Check for new badges when quiz completes
-    useEffect(() => {
-      if (state.user && quiz.isComplete) {
-        const newBadges = checkAndAwardBadges(state.user);
-        if (newBadges.length > 0) {
-          setPendingBadges(newBadges);
-          newBadges.forEach(badgeId => {
-            dispatch({ type: 'UNLOCK_BADGE', payload: badgeId });
-          });
-          playSound('badge');
-          sidesConfetti();
-        }
-        
-        if (accuracy >= 70) {
-          playSound('levelUp');
-          burstConfetti();
-        }
-      }
-    }, [quiz.isComplete]);
 
     return (
       <div className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center">
