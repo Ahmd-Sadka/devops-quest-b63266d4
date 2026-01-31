@@ -31,6 +31,11 @@ export function useBadges() {
       newBadges.push('docker-whisperer');
     }
 
+    // Ansible Automator - Complete Ansible level
+    if (user.levelProgress.ansible?.completed && !user.earnedBadges.includes('ansible-automator')) {
+      newBadges.push('ansible-automator');
+    }
+
     // DevOps Legend - Complete all levels
     const allCompleted = LEVELS.every(level => user.levelProgress[level.id]?.completed);
     if (allCompleted && !user.earnedBadges.includes('devops-legend')) {

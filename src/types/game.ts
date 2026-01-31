@@ -201,7 +201,8 @@ export const BADGES: Badge[] = [
   { id: 'script-breaker', name: 'Script Breaker', emoji: '🥈', description: 'Complete Level 2', condition: 'Complete Bash Ninja level', rarity: 'common' },
   { id: 'conflict-slayer', name: 'Git Conflict Slayer', emoji: '🥇', description: 'Complete Level 3', condition: 'Complete Git Survivor level', rarity: 'rare' },
   { id: 'docker-whisperer', name: 'Docker Whisperer', emoji: '🏆', description: 'Complete Level 4', condition: 'Complete Docker Architect level', rarity: 'epic' },
-  { id: 'devops-legend', name: 'DevOps Legend', emoji: '👑', description: 'Complete all levels', condition: 'Complete all 5 levels', rarity: 'legendary' },
+  { id: 'ansible-automator', name: 'Ansible Automator', emoji: '🤖', description: 'Complete Level 5', condition: 'Complete Ansible Automator level', rarity: 'epic' },
+  { id: 'devops-legend', name: 'DevOps Legend', emoji: '👑', description: 'Complete all levels', condition: 'Complete all 6 levels', rarity: 'legendary' },
   
   // Special achievements
   { id: 'speed-demon', name: 'Speed Demon', emoji: '⚡', description: 'Complete any level in under 10 minutes', condition: 'Speed run a level', rarity: 'rare' },
