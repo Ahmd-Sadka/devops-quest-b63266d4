@@ -54,6 +54,11 @@
     --level-git: 25 90% 55%;
     --level-docker: 200 90% 50%;
     --level-ansible: 0 75% 55%;
+    --level-kubernetes: 220 85% 55%;
+    --level-terraform: 265 80% 60%;
+    --level-aws: 35 100% 50%;
+    --level-cicd: 160 70% 45%;
+    --level-openshift: 355 85% 55%;
     --level-devops: 45 100% 55%;
 
     /* Streak fire */
@@ -188,6 +193,12 @@
   .level-bash { @apply bg-[hsl(var(--level-bash))]; }
   .level-git { @apply bg-[hsl(var(--level-git))]; }
   .level-docker { @apply bg-[hsl(var(--level-docker))]; }
+  .level-ansible { @apply bg-[hsl(var(--level-ansible))]; }
+  .level-kubernetes { @apply bg-[hsl(var(--level-kubernetes))]; }
+  .level-terraform { @apply bg-[hsl(var(--level-terraform))]; }
+  .level-aws { @apply bg-[hsl(var(--level-aws))]; }
+  .level-cicd { @apply bg-[hsl(var(--level-cicd))]; }
+  .level-openshift { @apply bg-[hsl(var(--level-openshift))]; }
   .level-devops { @apply bg-[hsl(var(--level-devops))]; }
 
   /* Streak fire effect */

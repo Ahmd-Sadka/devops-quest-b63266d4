@@ -1,6 +1,11 @@
 import { Question } from '@/types/game';
 import { ansibleQuestions } from './ansible-questions';
 import { additionalLinuxQuestions, additionalBashQuestions, additionalGitQuestions, additionalDockerQuestions, additionalDevOpsQuestions } from './additional-questions';
+import { kubernetesQuestions } from './kubernetes-questions';
+import { terraformQuestions } from './terraform-questions';
+import { awsQuestions } from './aws-questions';
+import { cicdQuestions } from './cicd-questions';
+import { openshiftQuestions } from './openshift-questions';
 
 // Pre-generated AI Question Bank - 150+ DevOps Questions
 
@@ -1676,6 +1681,11 @@ export const allQuestions: Question[] = [
   ...additionalGitQuestions,
   ...additionalDockerQuestions,
   ...additionalDevOpsQuestions,
+  ...kubernetesQuestions,
+  ...terraformQuestions,
+  ...awsQuestions,
+  ...cicdQuestions,
+  ...openshiftQuestions,
 ];
 
 // Helper function to get questions by level

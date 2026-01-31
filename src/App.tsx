@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import Quiz from "./pages/Quiz";
 import LevelMap from "./pages/LevelMap";
 import Leaderboard from "./pages/Leaderboard";
+import Profile from "./pages/Profile";
+import BossBattle from "./pages/BossBattle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/levels" element={<LevelMap />} />
             <Route path="/quiz/:levelId" element={<Quiz />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/boss" element={<BossBattle />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
