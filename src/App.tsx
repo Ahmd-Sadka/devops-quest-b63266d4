@@ -12,6 +12,8 @@ import Profile from "./pages/Profile";
 import BossBattle from "./pages/BossBattle";
 import Interview from "./pages/Interview";
 import InterviewDiscussion from "./pages/InterviewDiscussion";
+import Terminal from "./pages/Terminal";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/boss" element={<BossBattle />} />
             <Route path="/interview" element={<Interview />} />
             <Route path="/interview/discussion" element={<InterviewDiscussion />} />
+            <Route path="/terminal" element={<Terminal />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

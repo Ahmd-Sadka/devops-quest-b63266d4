@@ -8,7 +8,8 @@ import { AVATARS, LEVELS, BADGES, getXPForNextLevel } from '@/types/game';
 import { DailyChallenge } from './DailyChallenge';
 import { PowerUpBar } from './PowerUps';
 import { EasterEggNotification } from './EasterEggNotification';
-import { Map, Trophy, Flame, Target, Clock, Zap, Skull, User, Award, Sparkles, BookOpen, Lightbulb } from 'lucide-react';
+import { useEasterEggs } from '@/hooks/useEasterEggs';
+import { Map, Trophy, Flame, Target, Zap, Skull, User, Award, Sparkles, BookOpen, Lightbulb, Terminal, Settings } from 'lucide-react';
 
 // Fun DevOps facts
 const DEV_OPS_FACTS = [
@@ -39,6 +40,7 @@ const SECRET_ACHIEVEMENTS = [
 const Dashboard = () => {
   const { state } = useGame();
   const navigate = useNavigate();
+  const { handleClick, discoveredEggs, totalEggs } = useEasterEggs();
   const user = state.user!;
   const avatar = AVATARS.find(a => a.id === user.avatarId);
   const xpProgress = getXPForNextLevel(user.totalXP);
@@ -68,7 +70,7 @@ const Dashboard = () => {
   const bossesDefeated = user.stats.bossesDefeated;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8" onClick={handleClick}>
       <EasterEggNotification 
         message={null}
         onClose={() => {}}
@@ -90,6 +92,9 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+              <Settings className="h-5 w-5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
               <User className="h-5 w-5" />
             </Button>
@@ -224,7 +229,17 @@ const Dashboard = () => {
               Continue Learning
             </Button>
             
-<Button 
+            <Button 
+              size="lg"
+              variant="outline"
+              className="w-full h-16 text-lg border-green-500/50 hover:bg-green-500/10"
+              onClick={() => navigate('/terminal')}
+            >
+              <Terminal className="mr-3 h-6 w-6 text-green-400" />
+              Terminal Challenge
+            </Button>
+
+            <Button 
               size="lg"
               variant="outline"
               className="w-full h-16 text-lg border-destructive/50 hover:bg-destructive/10"
