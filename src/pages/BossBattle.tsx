@@ -196,14 +196,11 @@ const BossBattle = () => {
   
   const level = selectedLevel ? LEVELS.find(l => l.id === selectedLevel) : null;
   
+  // Clear any existing quiz session on mount only
   useEffect(() => {
     clearQuiz();
-    return () => {
-      setPhase('select');
-      setSelectedLevel(null);
-      setBossQuestion(null);
-    };
-  }, [clearQuiz]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">

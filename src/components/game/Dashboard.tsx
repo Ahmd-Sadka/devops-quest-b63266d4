@@ -8,7 +8,7 @@ import { AVATARS, LEVELS, BADGES, getXPForNextLevel } from '@/types/game';
 import { DailyChallenge } from './DailyChallenge';
 import { PowerUpBar } from './PowerUps';
 import { EasterEggNotification } from './EasterEggNotification';
-import { Map, Trophy, Flame, Target, Clock, Zap, Skull, User, Award, Sparkles, BookOpen, Lightbulb, Secret } from 'lucide-react';
+import { Map, Trophy, Flame, Target, Clock, Zap, Skull, User, Award, Sparkles, BookOpen, Lightbulb } from 'lucide-react';
 
 // Fun DevOps facts
 const DEV_OPS_FACTS = [
