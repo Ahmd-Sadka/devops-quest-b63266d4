@@ -5,12 +5,14 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BADGES, LEVELS, getXPForNextLevel, AVATARS } from '@/types/game';
 import { useBadges } from '@/hooks/useBadges';
-import { ArrowLeft, Trophy, Target, Zap, Clock, Star, Flame, Award, BarChart3 } from 'lucide-react';
+import { useEasterEggs } from '@/hooks/useEasterEggs';
+import { ArrowLeft, Trophy, Target, Zap, Star, Flame, Award, BarChart3, Sparkles } from 'lucide-react';
 
 const Profile = () => {
   const { state } = useGame();
   const navigate = useNavigate();
   const { getRarityColor, getRarityBorder } = useBadges();
+  const { discoveredEggs, totalEggs } = useEasterEggs();
   const user = state.user;
 
   if (!user) {
@@ -163,6 +165,45 @@ const Profile = () => {
               );
             })}
           </div>
+        </Card>
+
+        {/* Easter Eggs Section */}
+        <Card className="p-6 mb-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-5 w-5 text-purple-400" />
+            <h3 className="font-bold text-lg">Secret Discoveries</h3>
+            <span className="ml-auto text-sm text-purple-400">
+              {discoveredEggs.length} / {totalEggs}
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {['🎮', '🔍', '⚡', '🌙'].map((emoji, i) => {
+              const discovered = i < discoveredEggs.length;
+              return (
+                <div
+                  key={i}
+                  className={`
+                    p-4 rounded-xl text-center transition-all
+                    ${discovered
+                      ? 'bg-purple-500/20 border border-purple-500/40'
+                      : 'bg-muted/20 border border-muted/30 opacity-40'
+                    }
+                  `}
+                >
+                  <div className={`text-3xl mb-1 ${discovered ? '' : 'grayscale'}`}>
+                    {discovered ? emoji : '❓'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {discovered ? 'Discovered!' : 'Hidden'}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground text-center mt-4">
+            💡 Hint: Try the Konami Code, check the console, or explore at midnight!
+          </p>
         </Card>
 
         {/* Level Progress */}
