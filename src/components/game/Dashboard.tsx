@@ -1,12 +1,40 @@
 import { useGame } from '@/contexts/GameContext';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { AVATARS, LEVELS, BADGES, getXPForNextLevel } from '@/types/game';
 import { DailyChallenge } from './DailyChallenge';
 import { PowerUpBar } from './PowerUps';
-import { Map, Trophy, Flame, Target, Clock, Zap, Skull, User, Award, Sparkles } from 'lucide-react';
+import { EasterEggNotification } from './EasterEggNotification';
+import { Map, Trophy, Flame, Target, Clock, Zap, Skull, User, Award, Sparkles, BookOpen, Lightbulb, Secret } from 'lucide-react';
+
+// Fun DevOps facts
+const DEV_OPS_FACTS = [
+  "The term 'DevOps' was coined in 2009 at the Velocity conference.",
+  "AWS launched in 2006 with just S3, SQS, and EC2.",
+  "Docker containers share the host OS kernel, making them lightweight.",
+  "Git was created by Linus Torvalds in 2005.",
+  "Kubernetes means 'helmsman' in Greek - the logo is a ship's wheel!",
+  "Terraform was created by HashiCorp, same as Vault and Consul.",
+  "The average DevOps salary exceeds $120,000 annually.",
+  "Jenkins was named after butler character from Mr. Robot.",
+  "Linux runs 100% of the TOP 500 supercomputers.",
+  "GitHub processes millions of git operations daily.",
+  "Ansible uses YAML for playbooks - no coding required!",
+  "The first computer bug was an actual moth found in 1947.",
+  "90% of cloud workloads still run on Linux.",
+  "Git can track changes in any file, not just code!",
+  "CI/CD stands for Continuous Integration/Continuous Deployment.",
+];
+
+// Secret achievements (hidden fun goals)
+const SECRET_ACHIEVEMENTS = [
+  { id: 'night-owl', condition: () => new Date().getHours() >= 23 || new Date().getHours() < 5, emoji: '🦉', name: 'Night Owl', text: 'Studying after midnight!' },
+  { id: 'early-bird', condition: () => new Date().getHours() >= 5 && new Date().getHours() < 8, emoji: '🌅', name: 'Early Bird', text: 'Up before the sun!' },
+  { id: 'weekend-warrior', condition: () => [0, 6].includes(new Date().getDay()), emoji: '🎮', name: 'Weekend Warrior', text: 'Practicing on the weekend!' },
+];
 
 const Dashboard = () => {
   const { state } = useGame();
@@ -14,6 +42,18 @@ const Dashboard = () => {
   const user = state.user!;
   const avatar = AVATARS.find(a => a.id === user.avatarId);
   const xpProgress = getXPForNextLevel(user.totalXP);
+  
+  const [dailyFact] = useState(() => DEV_OPS_FACTS[Math.floor(Math.random() * DEV_OPS_FACTS.length)]);
+  const [activeSecret, setActiveSecret] = useState<{ emoji: string; name: string; text: string } | null>(null);
+  const [showSecret, setShowSecret] = useState(false);
+
+  // Check for secret achievements on mount
+  useEffect(() => {
+    const secret = SECRET_ACHIEVEMENTS.find(s => s.condition());
+    if (secret) {
+      setActiveSecret({ emoji: secret.emoji, name: secret.name, text: secret.text });
+    }
+  }, []);
 
   const motivationalMessages = [
     `You're on fire, ${user.username}! 🔥`,
@@ -29,6 +69,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
+      <EasterEggNotification 
+        message={null}
+        onClose={() => {}}
+      />
+      
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -54,6 +99,38 @@ const Dashboard = () => {
             </Button>
           </div>
         </div>
+
+        {/* Secret Achievement Popup */}
+        {showSecret && activeSecret && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 rounded-xl border border-purple-500/30 flex items-center justify-between animate-pulse">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{activeSecret.emoji}</span>
+              <div>
+                <p className="font-bold text-sm">🔓 Secret Unlocked: {activeSecret.name}</p>
+                <p className="text-sm text-muted-foreground">{activeSecret.text}</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setShowSecret(false)}>
+              ✕
+            </Button>
+          </div>
+        )}
+
+        {/* Daily Fun Fact */}
+        <Card className="p-4 mb-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/20">
+              <Lightbulb className="h-5 w-5 text-blue-500" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-medium text-blue-500 uppercase">Daily DevOps Fact</span>
+                <span className="text-xs text-muted-foreground">• Did you know?</span>
+              </div>
+              <p className="text-sm">{dailyFact}</p>
+            </div>
+          </div>
+        </Card>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -147,14 +224,24 @@ const Dashboard = () => {
               Continue Learning
             </Button>
             
-            <Button 
-              size="lg" 
+<Button 
+              size="lg"
               variant="outline"
               className="w-full h-16 text-lg border-destructive/50 hover:bg-destructive/10"
               onClick={() => navigate('/boss')}
             >
               <Skull className="mr-3 h-6 w-6 text-destructive" />
               Boss Battle Arena
+            </Button>
+
+            <Button 
+              size="lg"
+              variant="outline"
+              className="w-full h-16 text-lg border-primary/50 hover:bg-primary/10"
+              onClick={() => navigate('/interview')}
+            >
+              <BookOpen className="mr-3 h-6 w-6 text-primary" />
+              Interview Prep
             </Button>
             
             <div className="grid grid-cols-2 gap-4">

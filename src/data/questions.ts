@@ -6,6 +6,7 @@ import { terraformQuestions } from './terraform-questions';
 import { awsQuestions } from './aws-questions';
 import { cicdQuestions } from './cicd-questions';
 import { openshiftQuestions } from './openshift-questions';
+import { juniorInterviewQuestions } from './junior-interview-questions';
 
 // Pre-generated AI Question Bank - 150+ DevOps Questions
 
@@ -1690,6 +1691,9 @@ export const allQuestions: Question[] = [
 
 // Helper function to get questions by level
 export const getQuestionsByLevel = (levelId: string): Question[] => {
+  if (levelId === 'junior-interview') {
+    return juniorInterviewQuestions;
+  }
   return allQuestions.filter(q => q.levelId === levelId);
 };
 
@@ -1708,9 +1712,24 @@ export const shuffleArray = <T>(array: T[]): T[] => {
   return shuffled;
 };
 
-// Get a quiz set for a level
+/** Shuffle answer options so the correct answer isn't always in the same position (e.g. position 2). */
+export const shuffleQuestionOptions = (q: Question): Question => {
+  const indices = q.options.map((_, i) => i);
+  const shuffledIndices = shuffleArray(indices);
+  const newOptions = shuffledIndices.map((i) => q.options[i]);
+  const newCorrectAnswer = shuffledIndices.indexOf(q.correctAnswer);
+  return {
+    ...q,
+    options: newOptions,
+    correctAnswer: newCorrectAnswer,
+  };
+};
+
+// Get a quiz set for a level (with options shuffled per question)
 export const getQuizQuestions = (levelId: string, count: number = 10): Question[] => {
   const levelQuestions = getQuestionsByLevel(levelId);
   const shuffled = shuffleArray(levelQuestions);
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+  return shuffled
+    .slice(0, Math.min(count, shuffled.length))
+    .map(shuffleQuestionOptions);
 };

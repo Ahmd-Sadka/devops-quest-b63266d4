@@ -1,73 +1,164 @@
-# Welcome to your Lovable project
+# 🎮 DevOps Party
 
-## Project info
+> **Level up your DevOps knowledge. One question at a time.**  
+> A gamified quiz & interview-prep app for Linux, Bash, Git, Docker, Kubernetes, Terraform, CI/CD, Ansible, AWS, and more.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](./Dockerfile)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ What is this?
 
-**Use Lovable**
+**DevOps Party** turns interview prep and learning into a game: XP, levels, bosses, power-ups, streaks, and badges. Practice real DevOps/SRE topics in quiz mode or in a **discussion-style** flow (hint → reveal answer), then take on level bosses for bonus XP.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Features
 
-**Use your preferred IDE**
+### Core game
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **11 learning levels** — Linux → Bash → Git → Docker → Ansible → Kubernetes → Terraform → AWS → CI/CD → OpenShift → DevOps Legend  
+- **Unlock by XP** — Earn XP by answering questions; new levels unlock at thresholds  
+- **Shuffled answers** — Correct option is randomized so you can’t memorize position  
+- **Per-topic quizzes** — 10 questions per level; 70%+ accuracy to “complete” and unlock the next  
+- **Fresh session per topic** — Switching level or leaving quiz clears state so you always start clean  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Boss Battle Arena
 
-Follow these steps:
+- **Boss per level** — Challenge the boss of any unlocked level  
+- **HP battle** — Correct = damage boss (+ combo bonus); wrong or timeout = you take damage  
+- **Intro + countdown** — “BOSS APPROACHES!” then **3… 2… 1… GO!**  
+- **Combo & taunts** — Consecutive correct answers increase damage; boss taunts on hit/miss  
+- **Time Freeze power-up** — Pause the timer for 30 seconds during battle  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Power-ups (used in quiz & boss)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **50/50** — Remove two wrong answers (quiz)  
+- **Skip** — Skip current question without penalty (quiz)  
+- **Time Freeze** — Freeze boss timer 30s (boss only)  
+- **Hint** — Reveal a short hint from the explanation (quiz)  
 
-# Step 3: Install the necessary dependencies.
-npm i
+Earn more from the **Power-Up Shop** (Profile/Dashboard) with XP.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Interview prep
+
+- **Junior Interview (MCQ)** — Same topics, quiz format with shuffled options  
+- **Discussion style** — No MCQ: read question → optional hint → reveal full answer  
+- **Categories** — Linux, Bash, Docker, Kubernetes, Terraform, CI/CD, Ansible, **AWS**, **General DevOps**  
+- **Senior** — “Coming soon” section for future content  
+
+### Progression & polish
+
+- **Streaks** — Daily practice streak tracking  
+- **Badges** — Unlock by completing levels, bosses, accuracy, streaks  
+- **Leaderboard** — Compare XP and progress  
+- **Profile** — Avatar, stats, badges, power-up shop  
+- **Daily challenge** — Extra goals and bonus XP  
+- **Sound & confetti** — Correct/wrong, Level-Up, badge unlock  
+
+---
+
+## 🛠 Tech stack
+
+| Layer        | Tech |
+|-------------|------|
+| Build       | Vite 5, TypeScript 5 |
+| UI          | React 18, Tailwind CSS, shadcn/ui, Radix |
+| State       | React Context + useReducer (game state), TanStack Query (optional) |
+| Routing     | React Router 6 |
+| Persistence | localStorage (user, progress, power-ups) |
+
+---
+
+## 📦 Run locally
+
+### Prerequisites
+
+- **Node.js** 18+ (or 20+) and npm (or bun)
+
+### Install & dev
+
+```bash
+git clone <repo-url>
+cd "DevOps Party"
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open **http://localhost:8080** (or the URL Vite prints).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build for production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+npm run preview   # serve dist locally
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🐳 Docker
 
-This project is built with:
+### Build image
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+docker build -t devops-party .
+```
 
-## How can I deploy this project?
+### Run container
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+```bash
+docker run -p 8080:80 devops-party
+```
 
-## Can I connect a custom domain to my Lovable project?
+Open **http://localhost:8080**. The app is served by nginx (SPA fallback to `index.html`).
 
-Yes, you can!
+### Docker Compose (optional)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+docker compose up -d
+```
+
+---
+
+## 📁 Project structure (high level)
+
+```
+src/
+├── components/   # UI + game (Dashboard, PowerUps, BadgeNotification, …)
+├── contexts/     # GameContext (user, quiz, power-ups, clearQuiz, …)
+├── data/         # questions, junior-interview, discussion Q&A, levels
+├── hooks/        # useConfetti, useSoundEffects, useBadges
+├── pages/        # Index, Quiz, LevelMap, BossBattle, Interview, …
+├── types/        # game types (Question, Level, PowerUp, …)
+└── main.tsx
+```
+
+---
+
+## 🎯 Design choices
+
+- **Clear quiz on topic change / leave** — Entering a different level or leaving the quiz clears `currentQuiz` so the next run is always a new session.  
+- **Boss state reset on leave** — Leaving Boss Battle resets phase and selection so re-entry is clean.  
+- **Boss levels** — Only “real” levels have bosses; Interview Prep is excluded from the boss list.  
+- **Power-ups in context** — 50/50, Skip, Hint in Quiz; Time Freeze in Boss; all consume from the same inventory (Profile/Power-Up Shop).  
+
+---
+
+## 📄 License
+
+Use and modify as you like. No warranty.
+
+---
+
+**Have fun, and may your deployments be green.** 🚀

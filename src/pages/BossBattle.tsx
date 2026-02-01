@@ -1,89 +1,174 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { getQuestionsByLevel, shuffleArray } from '@/data/questions';
+import { getQuestionsByLevel, shuffleArray, shuffleQuestionOptions } from '@/data/questions';
 import { LEVELS, Question } from '@/types/game';
-import { Skull, Clock, Trophy, Zap, ArrowLeft } from 'lucide-react';
+import { Skull, Clock, Trophy, Zap, ArrowLeft, Snowflake } from 'lucide-react';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { PowerUpBar } from '@/components/game/PowerUps';
+
+const BOSS_LEVELS = LEVELS.filter((l) => l.id !== 'junior-interview');
 
 const BossBattle = () => {
-  const { state, dispatch, submitAnswer } = useGame();
+  const { state, dispatch, usePowerUp, clearQuiz } = useGame();
   const navigate = useNavigate();
   const { burstConfetti, sidesConfetti } = useConfetti();
   const { playSound } = useSoundEffects();
-  
+
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [bossQuestion, setBossQuestion] = useState<Question | null>(null);
-  const [phase, setPhase] = useState<'select' | 'intro' | 'battle' | 'victory' | 'defeat'>('select');
+  const [phase, setPhase] = useState<'select' | 'intro' | 'countdown' | 'battle' | 'victory' | 'defeat'>('select');
   const [timeLeft, setTimeLeft] = useState(60);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [bossHealth, setBossHealth] = useState(100);
   const [playerHealth, setPlayerHealth] = useState(100);
-  
+  const [combo, setCombo] = useState(0);
+  const [lastBossTaunt, setLastBossTaunt] = useState<string | null>(null);
+  const [introCountdown, setIntroCountdown] = useState(3);
+  const [timeFrozen, setTimeFrozen] = useState(false);
+  const timeUpProcessedRef = useRef(false);
+
+  const BOSS_TAUNTS_CORRECT = [
+    "Lucky guess... Next one will hurt!",
+    "You got one. Don't get cocky.",
+    "The next question will be your doom!",
+    "Pathetic. Try the next.",
+    "One hit. Many more to go.",
+  ];
+  const BOSS_TAUNTS_WRONG = [
+    "Too slow! Too weak!",
+    "Your knowledge is no match for me!",
+    "Wrong! Feel my power!",
+    "Another one bites the dust!",
+    "Is that all you've got?",
+  ];
+
   const user = state.user;
-  
+
+  // Redirect to home if user is not logged in (only runs once on mount)
   useEffect(() => {
-    if (phase === 'battle' && timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft(t => t - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    } else if (phase === 'battle' && timeLeft === 0) {
-      // Time's up - player takes damage
-      setPlayerHealth(h => h - 50);
-      if (playerHealth <= 50) {
-        setPhase('defeat');
-        playSound('wrong');
-      } else {
-        loadNextQuestion();
+    const checkUserAndRedirect = () => {
+      if (!user) {
+        navigate('/');
+      }
+    };
+    checkUserAndRedirect();
+  }, []); // Empty dependency - only run once on mount
+
+  // If user is not loaded, show loading state
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleBossPowerUp = (powerUp: { id: string; effect: string }) => {
+    if (powerUp.effect === 'time_freeze' && phase === 'battle' && !timeFrozen) {
+      if (usePowerUp(powerUp.id)) {
+        setTimeFrozen(true);
+        setTimeout(() => setTimeFrozen(false), 30000);
       }
     }
-  }, [phase, timeLeft, playerHealth]);
+  };
+  
+  useEffect(() => {
+    if (phase === 'countdown') {
+      if (introCountdown > 0) {
+        const t = setTimeout(() => setIntroCountdown((c) => c - 1), 1000);
+        return () => clearTimeout(t);
+      }
+      const t = setTimeout(() => {
+        setPhase('battle');
+        loadNextQuestion();
+      }, 600);
+      return () => clearTimeout(t);
+    }
+  }, [phase, introCountdown]);
+
+  useEffect(() => {
+    if (phase === 'battle' && !timeFrozen && timeLeft > 0) {
+      const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [phase, timeLeft, timeFrozen]);
+
+  useEffect(() => {
+    if (phase !== 'battle' || timeLeft !== 0) return;
+    if (timeUpProcessedRef.current) return;
+    timeUpProcessedRef.current = true;
+    setPlayerHealth((h) => {
+      const newH = Math.max(0, h - 50);
+      if (newH <= 0) setTimeout(() => setPhase('defeat'), 100);
+      else setTimeout(() => loadNextQuestion(), 100);
+      return newH;
+    });
+  }, [phase, timeLeft]);
   
   const loadNextQuestion = () => {
     if (!selectedLevel) return;
-    const questions = getQuestionsByLevel(selectedLevel).filter(q => q.difficulty === 'hard' || q.difficulty === 'evil');
+    timeUpProcessedRef.current = false;
+    const questions = getQuestionsByLevel(selectedLevel).filter(
+      (q) => q.difficulty === 'hard' || q.difficulty === 'evil'
+    );
+    if (questions.length === 0) {
+      setPhase('victory');
+      return;
+    }
     const randomQuestion = shuffleArray(questions)[0];
-    setBossQuestion(randomQuestion);
+    setBossQuestion(shuffleQuestionOptions(randomQuestion));
     setTimeLeft(60);
     setSelectedAnswer(null);
+    setLastBossTaunt(null);
+    setTimeFrozen(false);
   };
-  
+
   const startBattle = (levelId: string) => {
     setSelectedLevel(levelId);
     setPhase('intro');
     setBossHealth(100);
     setPlayerHealth(100);
-    
-    setTimeout(() => {
-      setPhase('battle');
-      loadNextQuestion();
-    }, 3000);
+    setCombo(0);
+    setLastBossTaunt(null);
+    setIntroCountdown(3);
+    setTimeFrozen(false);
+    timeUpProcessedRef.current = false;
+    setTimeout(() => setPhase('countdown'), 2500);
   };
   
   const handleAnswer = (answerIndex: number) => {
     if (selectedAnswer !== null || !bossQuestion) return;
-    
+
     setSelectedAnswer(answerIndex);
     const isCorrect = answerIndex === bossQuestion.correctAnswer;
-    
+
+    const damage = 35;
+    const comboBonus = isCorrect ? Math.min(combo * 5, 15) : 0;
+    const totalBossDamage = isCorrect ? damage + comboBonus : 0;
+    const totalPlayerDamage = isCorrect ? 0 : damage;
+
     if (isCorrect) {
       playSound('correct');
-      setBossHealth(h => {
-        const newHealth = h - 35;
+      setCombo((c) => c + 1);
+      setLastBossTaunt(BOSS_TAUNTS_CORRECT[Math.floor(Math.random() * BOSS_TAUNTS_CORRECT.length)]);
+      setBossHealth((h) => {
+        const newHealth = h - totalBossDamage;
         if (newHealth <= 0) {
           setTimeout(() => {
             setPhase('victory');
             sidesConfetti();
             burstConfetti();
             playSound('levelUp');
-            
             if (selectedLevel) {
               dispatch({ type: 'DEFEAT_BOSS', payload: selectedLevel as any });
-              dispatch({ type: 'ADD_XP', payload: 200 });
+              dispatch({ type: 'ADD_XP', payload: 200 + combo * 10 });
             }
           }, 500);
         }
@@ -91,27 +176,35 @@ const BossBattle = () => {
       });
     } else {
       playSound('wrong');
-      setPlayerHealth(h => {
-        const newHealth = h - 35;
+      setCombo(0);
+      setLastBossTaunt(BOSS_TAUNTS_WRONG[Math.floor(Math.random() * BOSS_TAUNTS_WRONG.length)]);
+      setPlayerHealth((h) => {
+        const newHealth = h - totalPlayerDamage;
         if (newHealth <= 0) {
           setTimeout(() => setPhase('defeat'), 500);
         }
         return Math.max(0, newHealth);
       });
     }
-    
-    if (bossHealth > 35 && playerHealth > 35) {
+
+    const newBossH = bossHealth - (isCorrect ? totalBossDamage : 0);
+    const newPlayerH = playerHealth - (isCorrect ? 0 : totalPlayerDamage);
+    if (newBossH > 0 && newPlayerH > 0) {
       setTimeout(loadNextQuestion, 1500);
     }
   };
   
   const level = selectedLevel ? LEVELS.find(l => l.id === selectedLevel) : null;
   
-  if (!user) {
-    navigate('/');
-    return null;
-  }
-  
+  useEffect(() => {
+    clearQuiz();
+    return () => {
+      setPhase('select');
+      setSelectedLevel(null);
+      setBossQuestion(null);
+    };
+  }, [clearQuiz]);
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
@@ -132,7 +225,7 @@ const BossBattle = () => {
               Choose a level to face its Boss! Defeat bosses to earn bonus XP and badges.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {LEVELS.filter(l => user.levelProgress[l.id]?.unlocked).map((level) => {
+              {BOSS_LEVELS.filter((l) => user.levelProgress[l.id]?.unlocked).map((level) => {
                 const defeated = user.levelProgress[level.id]?.bossDefeated;
                 return (
                   <Card
@@ -170,9 +263,49 @@ const BossBattle = () => {
             <p className="text-xl text-muted-foreground">Prepare yourself...</p>
           </div>
         )}
+
+        {phase === 'countdown' && level && (
+          <div className="text-center space-y-6 animate-scale-in">
+            <div className="text-9xl font-mono font-bold text-primary animate-pulse">
+              {introCountdown > 0 ? introCountdown : 'GO!'}
+            </div>
+            <p className="text-xl text-muted-foreground">
+              {introCountdown > 0 ? 'Get ready...' : 'Fight!'}
+            </p>
+          </div>
+        )}
         
         {phase === 'battle' && bossQuestion && level && (
           <div className="space-y-6">
+            {/* Power-ups (Time Freeze in battle) */}
+            <div className="flex items-center justify-end gap-2">
+              <span className="text-xs text-muted-foreground mr-2">Power-ups:</span>
+              <PowerUpBar
+                disabled={selectedAnswer !== null || timeFrozen}
+                onUsePowerUp={handleBossPowerUp}
+              />
+              {timeFrozen && (
+                <span className="flex items-center gap-1 text-sm text-primary">
+                  <Snowflake className="h-4 w-4 animate-pulse" />
+                  Time frozen!
+                </span>
+              )}
+            </div>
+            {/* Combo & Boss Taunt */}
+            {(combo > 0 || lastBossTaunt) && (
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {combo > 0 && (
+                  <span className="px-3 py-1 rounded-full bg-xp/20 text-xp font-bold text-sm">
+                    🔥 {combo} Combo!
+                  </span>
+                )}
+                {lastBossTaunt && (
+                  <span className="px-3 py-1 rounded-lg bg-destructive/10 text-destructive text-sm italic max-w-md">
+                    Boss: &quot;{lastBossTaunt}&quot;
+                  </span>
+                )}
+              </div>
+            )}
             {/* Health Bars */}
             <div className="grid grid-cols-2 gap-8">
               <div>

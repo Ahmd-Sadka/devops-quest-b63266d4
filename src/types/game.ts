@@ -2,7 +2,7 @@
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'evil';
 
-export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'ansible' | 'kubernetes' | 'terraform' | 'aws' | 'cicd' | 'openshift' | 'devops';
+export type LevelId = 'linux' | 'bash' | 'git' | 'docker' | 'ansible' | 'kubernetes' | 'terraform' | 'aws' | 'cicd' | 'openshift' | 'devops' | 'junior-interview';
 
 export interface Level {
   id: LevelId;
@@ -27,6 +27,15 @@ export interface Question {
   xpReward: number;
   tags: string[];
   isBoss?: boolean;
+}
+
+/** Discussion-style interview: question → hint (optional) → reveal answer. No MCQ. */
+export interface InterviewDiscussionQuestion {
+  id: string;
+  question: string;
+  hint?: string;
+  answer: string;
+  category: 'Linux' | 'Bash' | 'Docker' | 'Kubernetes' | 'Terraform' | 'CI/CD' | 'Ansible' | 'AWS' | 'General DevOps';
 }
 
 export interface Badge {
@@ -242,6 +251,15 @@ export const LEVELS: Level[] = [
     color: 'level-devops',
     unlockRequirement: 8500,
     totalQuestions: 30,
+  },
+  {
+    id: 'junior-interview',
+    name: 'Junior Interview Prep',
+    emoji: '📋',
+    description: 'Practice common DevOps/SRE junior interview questions',
+    color: 'level-linux',
+    unlockRequirement: 0,
+    totalQuestions: 60,
   },
 ];
 

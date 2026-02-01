@@ -29,9 +29,9 @@ const LevelMap = () => {
           </div>
         </div>
 
-        {/* Level Cards */}
+        {/* Level Cards (exclude interview-only level) */}
         <div className="space-y-4">
-          {LEVELS.map((level, index) => {
+          {LEVELS.filter((l) => l.id !== 'junior-interview').map((level, index) => {
             const progress = user.levelProgress[level.id];
             const isUnlocked = progress?.unlocked;
             const isCompleted = progress?.completed;

@@ -10,6 +10,8 @@ import LevelMap from "./pages/LevelMap";
 import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
 import BossBattle from "./pages/BossBattle";
+import Interview from "./pages/Interview";
+import InterviewDiscussion from "./pages/InterviewDiscussion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/boss" element={<BossBattle />} />
+            <Route path="/interview" element={<Interview />} />
+            <Route path="/interview/discussion" element={<InterviewDiscussion />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

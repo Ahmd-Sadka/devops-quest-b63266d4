@@ -21,6 +21,7 @@ type GameAction =
   | { type: 'ADD_POWERUP'; payload: { id: string; amount: number } }
   | { type: 'COMPLETE_DAILY_CHALLENGE'; payload: string }
   | { type: 'DEFEAT_BOSS'; payload: LevelId }
+  | { type: 'CLEAR_QUIZ' }
   | { type: 'RESET_GAME' };
 
 const initialLevelProgress: Record<LevelId, LevelProgress> = {
@@ -35,6 +36,7 @@ const initialLevelProgress: Record<LevelId, LevelProgress> = {
   cicd: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
   openshift: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
   devops: { unlocked: false, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
+  'junior-interview': { unlocked: true, completed: false, questionsAnswered: 0, correctAnswers: 0, attempts: 0 },
 };
 
 const createNewUser = (username: string, avatarId: string): UserProgress => ({
@@ -270,7 +272,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     
     case 'SET_ONBOARDING':
       return { ...state, isOnboarding: action.payload };
-    
+
+    case 'CLEAR_QUIZ':
+      return { ...state, currentQuiz: null };
+
     case 'RESET_GAME':
       localStorage.removeItem('devops-quest-user');
       return { user: null, currentQuiz: null, isOnboarding: true };
@@ -287,7 +292,9 @@ interface GameContextType {
   startQuiz: (levelId: LevelId, questions: any[]) => void;
   submitAnswer: (questionId: string, selectedAnswer: number, isCorrect: boolean, timeSpent: number, xpEarned: number) => void;
   completeQuiz: () => void;
+  clearQuiz: () => void;
   usePowerUp: (powerUpId: string) => boolean;
+  addXP: (amount: number) => void;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -363,6 +370,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'COMPLETE_QUIZ' });
   };
 
+  const clearQuiz = () => {
+    dispatch({ type: 'CLEAR_QUIZ' });
+  };
+
   const usePowerUp = (powerUpId: string): boolean => {
     if (!state.user || (state.user.powerUps[powerUpId] || 0) <= 0) {
       return false;
@@ -371,8 +382,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
+  const addXP = (amount: number) => {
+    if (amount <= 0) return;
+    dispatch({ type: 'ADD_XP', payload: amount });
+  };
+
   return (
-    <GameContext.Provider value={{ state, dispatch, createUser, startQuiz, submitAnswer, completeQuiz, usePowerUp }}>
+    <GameContext.Provider value={{ state, dispatch, createUser, startQuiz, submitAnswer, completeQuiz, clearQuiz, usePowerUp, addXP }}>
       {children}
     </GameContext.Provider>
   );
